@@ -24,8 +24,8 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           IconButton(
             onPressed: () async {
-              final Note note = await NotesDatabase.instance.readNote(1);
-              print(note.title);
+              final List<Note> notes = await NotesDatabase.instance.readAllNotes();
+              print(notes.last.id);
             },
             icon: Icon(
               Icons.search,
@@ -47,6 +47,24 @@ class _HomeScreenState extends State<HomeScreen> {
           final note = Note(isImportant: false, number: 10, title: 'Test 1', description: 'This is a test', createdTime: DateTime.now());
           await NotesDatabase.instance.create(note);
         },
+      ),
+      body: Center(
+        child: FutureBuilder(
+            future: NotesDatabase.instance.readAllNotes(),
+            builder: (BuildContext context, AsyncSnapshot<List<Note>> snapshot) {
+              if (!snapshot.hasData) {
+                return Center(child: Text('Loading...'));
+              }
+              return ListView(
+                children: snapshot.data!.map((note) {
+                  return Center(
+                      child: ListTile(
+                          title: Text(
+                    note.title,
+                  )));
+                }).toList(),
+              );
+            }),
       ),
     );
   }
