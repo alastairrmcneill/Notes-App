@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:notes_app/db/notes_database.dart';
+import 'package:notes_app/models/note_model.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -21,8 +23,9 @@ class _HomeScreenState extends State<HomeScreen> {
         centerTitle: false,
         actions: [
           IconButton(
-            onPressed: () {
-              print('Search pressed');
+            onPressed: () async {
+              final Note note = await NotesDatabase.instance.readNote(1);
+              print(note.title);
             },
             icon: Icon(
               Icons.search,
@@ -40,8 +43,9 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
-        onPressed: () {
-          print('Adding a new note');
+        onPressed: () async {
+          final note = Note(isImportant: false, number: 10, title: 'Test 1', description: 'This is a test', createdTime: DateTime.now());
+          await NotesDatabase.instance.create(note);
         },
       ),
     );

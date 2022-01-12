@@ -58,10 +58,10 @@ class Note {
 
   static Note fromJSON(Map<String, Object?> json) => Note(
         id: json[NoteFields.id] as int?,
-        isImportant: json[NoteFields.isImportant] as bool,
+        isImportant: json[NoteFields.isImportant] == 1,
         number: json[NoteFields.number] as int,
         title: json[NoteFields.title] as String,
         description: json[NoteFields.description] as String,
-        createdTime: DateTime.parse([NoteFields.createdTime] as String),
+        createdTime: DateTime.parse(json[NoteFields.createdTime] as String),
       );
 }

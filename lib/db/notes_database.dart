@@ -48,16 +48,18 @@ class NotesDatabase {
 
   Future<Note> readNote(int id) async {
     final db = await instance.database;
-    final List<Map<String, Object>> maps = db.query(
+
+    final maps = await db.query(
       tableNotes,
       columns: NoteFields.values,
       where: '${NoteFields.id} = ?',
       whereArgs: [id],
-    ) as List<Map<String, Object>>;
+    );
+
     if (maps.isNotEmpty) {
       return Note.fromJSON(maps.first);
     } else {
-      throw Exception('ID ${id} not found.');
+      throw Exception('ID $id not found');
     }
   }
 
