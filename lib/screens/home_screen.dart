@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:notes_app/db/notes_database.dart';
 import 'package:notes_app/models/note_model.dart';
+import 'package:notes_app/screens/note.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -10,6 +11,9 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  bool isLoading = false;
+  late List<Note> notes;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,8 +48,11 @@ class _HomeScreenState extends State<HomeScreen> {
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
         onPressed: () async {
-          final note = Note(isImportant: false, number: 10, title: 'Test 1', description: 'This is a test', createdTime: DateTime.now());
-          await NotesDatabase.instance.create(note);
+          await Navigator.of(context).push(
+            MaterialPageRoute(builder: (context) => NoteScreen()),
+          );
+
+          refreshNotes();
         },
       ),
       body: Center(
@@ -67,5 +74,10 @@ class _HomeScreenState extends State<HomeScreen> {
             }),
       ),
     );
+  }
+
+  Future refreshNotes() async {
+    notes = await NotesDatabase.instance.readAllNotes();
+    setState(() {});
   }
 }
