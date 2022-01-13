@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:notes_app/db/notes_database.dart';
 import 'package:notes_app/models/note_model.dart';
 import 'package:notes_app/screens/note.dart';
+import 'package:notes_app/widgets/note_tile.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -15,31 +16,41 @@ class _HomeScreenState extends State<HomeScreen> {
   late List<Note> notes;
 
   @override
+  void initState() {
+    super.initState();
+
+    refreshNotes();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Notes App',
-          style: TextStyle(
-            fontWeight: FontWeight.w300,
+        title: Transform.translate(
+          offset: const Offset(8, 0),
+          child: const Text(
+            'Notes App',
+            style: TextStyle(
+              fontWeight: FontWeight.w300,
+              fontSize: 28,
+            ),
           ),
         ),
         centerTitle: false,
         actions: [
           IconButton(
-            onPressed: () async {
-              final List<Note> notes = await NotesDatabase.instance.readAllNotes();
-              print(notes.last.id);
+            onPressed: () {
+              print('Search pressed');
             },
-            icon: Icon(
+            icon: const Icon(
               Icons.search,
             ),
           ),
           IconButton(
             onPressed: () {
-              print('Search pressed');
+              print('More pressed');
             },
-            icon: Icon(
+            icon: const Icon(
               Icons.more_vert,
             ),
           )
@@ -55,29 +66,31 @@ class _HomeScreenState extends State<HomeScreen> {
           refreshNotes();
         },
       ),
-      body: Center(
-        child: FutureBuilder(
-            future: NotesDatabase.instance.readAllNotes(),
-            builder: (BuildContext context, AsyncSnapshot<List<Note>> snapshot) {
-              if (!snapshot.hasData) {
-                return Center(child: Text('Loading...'));
-              }
-              return ListView(
-                children: snapshot.data!.map((note) {
-                  return Center(
-                      child: ListTile(
-                          title: Text(
-                    note.title,
-                  )));
-                }).toList(),
-              );
-            }),
-      ),
+      body: isLoading
+          ? const Text(
+              'Loading',
+              style: TextStyle(color: Colors.white, fontSize: 24),
+            )
+          : notes.isEmpty
+              ? const Text(
+                  'No Notes',
+                  style: TextStyle(color: Colors.white, fontSize: 24),
+                )
+              : ListView.builder(
+                  itemCount: notes.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    final note = notes[index];
+                    return NoteTile(note);
+                  },
+                ),
     );
   }
 
   Future refreshNotes() async {
+    setState(() => isLoading = true);
+
     notes = await NotesDatabase.instance.readAllNotes();
-    setState(() {});
+
+    setState(() => isLoading = false);
   }
 }
